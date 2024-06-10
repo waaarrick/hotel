@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Hotel</title>
+    <link href="style.css" rel="stylesheet">
+</head>
+<body onload="initFormulaire()">
+    <div class="container">
+        <div class="form">
+            <table class="form-table" id="table">
+                <tr>
+                    <td>
+                        <label for="sejour">Lieu de séjour</label>
+                        <input type="text" id="sejour" name="sejour" oninput="updateConfirmation()">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="datearr">Arrivée</label>
+                        <input type="date" id="datearr" name="datearr" oninput="updateConfirmation()">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="datedep">Départ</label>
+                        <input type="date" id="datedep" name="datedep" oninput="updateConfirmation()">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="adulte">Adulte</label>
+                        <input type="number" id="adulte" name="adulte" value="0" readonly>
+                        <button type="button" onclick="updateValue('adulte', 1)">+</button>
+                        <button type="button" onclick="updateValue('adulte', -1)">-</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="enfant">Enfant</label>
+                        <input type="number" id="enfant" name="enfant" value="0" readonly>
+                        <button type="button" onclick="updateValue('enfant', 1); addChild()">+</button>
+                        <button type="button" onclick="updateValue('enfant', -1)">-</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="chambre">Chambre</label>
+                        <input type="number" id="chambre" name="chambre" value="0" readonly>
+                        <button type="button" onclick="updateValue('chambre', 1)">+</button>
+                        <button type="button" onclick="updateValue('chambre', -1)">-</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="workTrip">Je voyage pour le travail</label>
+                        <input type="checkbox" id="workTrip" name="workTrip" onchange="updateConfirmation()">
+                    </td>
+                </tr>
+            </table>
+            <button type="button" onclick="initFormulaire()">Effacer</button>
+        </div>
+        <div class="confirmation">
+            <h3>Confirmation réservation</h3>
+            <p><strong>Lieu de séjour:</strong> <span id="confirmsejour">Où souhaitez-vous aller ?</span></p>
+            <p><strong>Arrivée:</strong> <span id="confirmdatearr">YYYY-MM-DD</span></p>
+            <p><strong>Départ:</strong> <span id="confirmdatedep">YYYY-MM-DD</span></p>
+            <p><strong>Nombre(s) d'adulte(s):</strong> <span id="confirmAdulte">0</span></p>
+            <p><strong>Nombre(s) d'enfant(s):</strong> <span id="confirmEnfant">0</span></p>
+            <p><strong>Nombre(s) de chambre(s):</strong> <span id="confirmChambre">0</span></p>
+            <p><strong>Voyage pour le travail:</strong> <span id="confirmWorkTrip">Non</span></p>
+        </div>
+    </div>
+    <script>
+var ctab = document.getElementById('table');
+
+function initFormulaire() {
+    document.getElementById('sejour').value = "";
+    document.getElementById('datearr').value = "";
+    document.getElementById('datedep').value = "";
+    document.getElementById('adulte').value = 0;
+    document.getElementById('enfant').value = 0;
+    document.getElementById('chambre').value = 0;
+    document.getElementById('workTrip').checked = false;
+    document.getElementById('confirmsejour').innerText = 'Où souhaitez-vous aller ?';
+    document.getElementById('confirmdatearr').innerText = 'YYYY-MM-DD';
+    document.getElementById('confirmdatedep').innerText = 'YYYY-MM-DD';
+    document.getElementById('confirmAdulte').innerText = '0';
+    document.getElementById('confirmEnfant').innerText = '0';
+    document.getElementById('confirmChambre').innerText = '0';
+    document.getElementById('confirmWorkTrip').innerText = 'Non';
+
+    var childInputs = document.querySelectorAll('.child-input');
+    childInputs.forEach(function(input) {
+        input.parentElement.parentElement.remove();
+    });
+}
+
+function updateValue(id, delta) {
+    var input = document.getElementById(id);
+    var newValue = parseInt(input.value) + delta;
+    if (newValue >= 0) {
+        input.value = newValue;
+        if (id === 'enfant' && delta < 0) {
+            var enfantCount = parseInt(input.value) + 1;
+            var elementToRemove = document.getElementById('ageEnfant' + enfantCount);
+            if (elementToRemove) {
+                elementToRemove.parentElement.parentElement.remove();
+            }
+        }
+    }
+}
+
+function addChild() {
+    var enfantInput = document.getElementById('enfant');
+    var enfantCount = parseInt(enfantInput.value);
+    var tr = document.createElement('tr');
+    var td = document.createElement('td');
+    td.colSpan = 6;
+    var label = document.createElement('label');
+    label.innerHTML = "Age enfant " + enfantCount + ": ";
+    var input = document.createElement('input');
+    input.type = "number";
+    input.id = "ageEnfant" + enfantCount;
+    input.placeholder = "Age enfant " + enfantCount;
+    input.className = "child-input";
+    td.appendChild(label);
+    td.appendChild(input);
+    tr.appendChild(td);
+    document.querySelector('.form-table').appendChild(tr);
+}
+
+function updateConfirmation() {
+    var sejour = document.getElementById('sejour').value;
+    var datearr = document.getElementById('datearr').value;
+    var datedep = document.getElementById('datedep').value;
+
+    document.getElementById('confirmsejour').innerText = sejour || 'Où souhaitez-vous aller ?';
+    document.getElementById('confirmdatearr').innerText = datearr || 'YYYY-MM-DD';
+    document.getElementById('confirmdatedep').innerText = datedep || 'YYYY-MM-DD';
+    document.getElementById('confirmAdulte').innerText = document.getElementById('adulte').value;
+    document.getElementById('confirmEnfant').innerText = document.getElementById('enfant').value;
+    document.getElementById('confirmChambre').innerText = document.getElementById('chambre').value;
+    document.getElementById('confirmWorkTrip').innerText = document.getElementById('workTrip').checked ? 'Oui' : 'Non';
+}
+        
+    </script>
+</body>
+</html>
